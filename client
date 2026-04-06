@@ -1,0 +1,29 @@
+#include <stdio.h>
+#include <string.h>
+#include <unistd.h>
+#include <arpa/inet.h>
+
+int main() {
+    int sock;
+    struct sockaddr_in server;
+    char *message = "GET / HTTP/1.1\r\nHost: example.com\r\n\r\n";
+    char buffer[4096];
+
+    sock = socket(AF_INET, SOCK_STREAM, 0);
+
+    server.sin_addr.s_addr = inet_addr("93.184.216.34"); // example.com
+    server.sin_family = AF_INET;
+    server.sin_port = htons(80);
+
+    connect(sock, (struct sockaddr *)&server, sizeof(server));
+
+    send(sock, message, strlen(message), 0);
+
+    int bytes = recv(sock, buffer, sizeof(buffer), 0);
+    buffer[bytes] = '\0';
+
+    printf("%s\n", buffer);
+
+    close(sock);
+    return 0;
+}
