@@ -1,0 +1,28 @@
+#include <stdio.h>
+#include <unistd.h>
+#include <arpa/inet.h>
+
+int main() {
+    int server_fd, client_sock;
+    struct sockaddr_in server, client;
+    socklen_t c = sizeof(struct sockaddr_in);
+
+    server_fd = socket(AF_INET, SOCK_STREAM, 0);
+
+    server.sin_family = AF_INET;
+    server.sin_addr.s_addr = INADDR_ANY;
+    server.sin_port = htons(8888);
+
+    bind(server_fd, (struct sockaddr *)&server, sizeof(server));
+    listen(server_fd, 3);
+
+    printf("Waiting for connection...\n");
+
+    client_sock = accept(server_fd, (struct sockaddr *)&client, &c);
+
+    char *message = "Hello from server\n";
+    write(client_sock, message, strlen(message));
+
+    close(client_sock);
+    close(server_fd);
+}
