@@ -1,0 +1,47 @@
+#include <stdio.h>
+#include <string.h>
+#include <unistd.h>
+#include <netdb.h>
+#include <arpa/inet.h>
+
+int main(int argc, char *argv[]) {
+    if (argc < 2) {
+        printf("Usage: %s <hostname>\n", argv[0]);
+        return 1;
+    }
+
+    struct hostent *host = gethostbyname(argv[1]);
+    if (!host) {
+        perror("DNS failed");
+        return 1;
+    }
+
+    int sock = socket(AF_INET, SOCK_STREAM, 0);
+
+    struct sockaddr_in server;
+    server.sin_family = AF_INET;
+    server.sin_port = htons(80);
+    memcpy(&server.sin_addr, host->h_addr, host->h_length);
+
+    if (connect(sock, (struct sockaddr *)&server, sizeof(server)) < 0) {
+        perror("Connect failed");
+        return 1;
+    }
+
+    char request[512];
+    snprintf(request, sizeof(request),
+        "GET / HTTP/1.1\r\nHost: %s\r\nConnection: close\r\n\r\n", argv[1]);
+
+    send(sock, request, strlen(request), 0);
+
+    char buffer[4096];
+    int bytes;
+
+    while ((bytes = recv(sock, buffer, sizeof(buffer)-1, 0)) > 0) {
+        buffer[bytes] = '\0';
+        printf("%s", buffer);
+    }
+
+    close(sock);
+    return 0;
+}
