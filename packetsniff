@@ -1,0 +1,22 @@
+#include <stdio.h>
+#include <sys/socket.h>
+#include <netinet/ip.h>
+
+int main() {
+    int sock = socket(AF_INET, SOCK_RAW, IPPROTO_TCP);
+
+    char buffer[65536];
+
+    while (1) {
+        int data_size = recv(sock, buffer, sizeof(buffer), 0);
+
+        struct iphdr *ip = (struct iphdr *)buffer;
+
+        printf("Packet: %d bytes | Src: %d.%d.%d.%d\n",
+            data_size,
+            ip->saddr & 0xFF,
+            (ip->saddr >> 8) & 0xFF,
+            (ip->saddr >> 16) & 0xFF,
+            (ip->saddr >> 24) & 0xFF);
+    }
+}
