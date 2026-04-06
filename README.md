@@ -5,7 +5,7 @@ remember these are extremely basic, do not run on anything important.
 
 
 
-the overall goals here are to spin up something extremely basic to witness the "gears turning" at the lowest level possible. 
+the overall goal here is to run something extremely basic to witness the "gears turning" at the lowest level possible. 
 
 
 
